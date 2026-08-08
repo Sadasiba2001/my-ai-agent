@@ -1,10 +1,13 @@
+import os
 import ollama
+from dotenv import load_dotenv
 
 from tools.filesystem import list_files
 
+load_dotenv()
 
-MODEL = "qwen3:8b"
-
+MODEL = os.getenv("OLLAMA_MODEL", "")
+OLLAMA_HOST = os.getenv("OLLAMA_HOST", "")
 
 TOOLS = [
     {

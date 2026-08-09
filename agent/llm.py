@@ -1,13 +1,25 @@
 import os
+
 import ollama
 from dotenv import load_dotenv
 
-from tools.filesystem import list_files
+from tools.registry import execute_tool
+
 
 load_dotenv()
 
-MODEL = os.getenv("OLLAMA_MODEL", "")
-OLLAMA_HOST = os.getenv("OLLAMA_HOST", "")
+
+MODEL = os.getenv("OLLAMA_MODEL", "qwen3:8b")
+OLLAMA_HOST = os.getenv(
+    "OLLAMA_HOST",
+    "http://localhost:11434"
+)
+
+
+ollama_client = ollama.Client(
+    host=OLLAMA_HOST
+)
+
 
 TOOLS = [
     {
@@ -34,19 +46,90 @@ TOOLS = [
                 "required": ["path"]
             }
         }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "read_file",
+            "description": (
+                "Read the contents of a text file. "
+                "Use this tool when the user asks "
+                "to read, inspect, analyze, or explain "
+                "a file."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "path": {
+                        "type": "string",
+                        "description": (
+                            "Path of the text file to read."
+                        )
+                    }
+                },
+                "required": ["path"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "write_file",
+            "description": (
+                "Create or overwrite a text file inside "
+                "the workspace directory. "
+                "Use this when the user asks you to create "
+                "or write a file."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "path": {
+                        "type": "string",
+                        "description": (
+                            "File path relative to workspace."
+                        )
+                    },
+                    "content": {
+                        "type": "string",
+                        "description": (
+                            "Complete content to write into the file."
+                        )
+                    }
+                },
+                "required": [
+                    "path",
+                    "content"
+                ]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "run_python",
+            "description": (
+                "Execute a Python script inside the workspace "
+                "and return its output and errors. "
+                "Use this tool when you need to test or execute "
+                "a Python program."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "path": {
+                        "type": "string",
+                        "description": (
+                            "Path of the Python script relative "
+                            "to workspace."
+                        )
+                    }
+                },
+                "required": ["path"]
+            }
+        }
     }
 ]
-
-
-def execute_tool(tool_name: str, arguments: dict) -> str:
-
-    print(f"[Tool] Executing: {tool_name}")
-    print(f"[Tool] Arguments: {arguments}")
-
-    if tool_name == "list_files":
-        return list_files(arguments.get("path", "."))
-
-    return f"Unknown tool: {tool_name}"
 
 
 def ask_llm(prompt: str) -> str:
@@ -57,10 +140,23 @@ def ask_llm(prompt: str) -> str:
         {
             "role": "system",
             "content": (
-                "You are an AI agent running on the user's computer. "
-                "You have access to tools. "
-                "When the user asks about files or directories, "
-                "use the appropriate tool."
+                "You are an AI agent running on the user's computer.\n\n"
+
+                "You have tools for working with files and Python.\n\n"
+
+                "Available capabilities:\n"
+                "- list_files: inspect directories\n"
+                "- read_file: read text files\n"
+                "- write_file: create or modify files inside workspace/\n"
+                "- run_python: execute Python scripts inside workspace/\n\n"
+
+                "Use tools whenever they are needed to complete "
+                "the user's request.\n\n"
+
+                "After creating or modifying Python code, "
+                "you can use run_python to test it.\n\n"
+
+                "Continue using tools until the task is complete."
             )
         },
         {
@@ -69,55 +165,56 @@ def ask_llm(prompt: str) -> str:
         }
     ]
 
-    # First request
-    response = ollama.chat(
-        model=MODEL,
-        messages=messages,
-        tools=TOOLS
-    )
+    while True:
 
-    message = response["message"]
-
-    # No tool required
-    if not message.get("tool_calls"):
-        print("[Agent] Response received.")
-        return message["content"]
-
-    # Tool requested
-    print("[Agent] Qwen wants to use a tool.")
-
-    messages.append(message)
-
-    # Execute every requested tool
-    for tool_call in message["tool_calls"]:
-
-        tool_name = tool_call["function"]["name"]
-        arguments = tool_call["function"]["arguments"]
-
-        result = execute_tool(
-            tool_name,
-            arguments
+        response = ollama_client.chat(
+            model=MODEL,
+            messages=messages,
+            tools=TOOLS
         )
 
-        print("[Tool] Result:")
-        print(result)
+        message = response["message"]
 
-        messages.append(
-            {
-                "role": "tool",
-                "content": result
-            }
-        )
+        # --------------------------------
+        # No tool required
+        # --------------------------------
 
-    # Send tool result back to Qwen
-    print("\n[Agent] Sending tool result back to Qwen...")
+        if not message.get("tool_calls"):
 
-    final_response = ollama.chat(
-        model=MODEL,
-        messages=messages,
-        tools=TOOLS
-    )
+            print("[Agent] Final response received.")
 
-    print("[Agent] Final response received.")
+            return message["content"]
 
-    return final_response["message"]["content"]
+        # --------------------------------
+        # Tool requested
+        # --------------------------------
+
+        print("[Agent] Qwen wants to use a tool.")
+
+        messages.append(message)
+
+        for tool_call in message["tool_calls"]:
+
+            tool_name = tool_call["function"]["name"]
+
+            arguments = tool_call["function"]["arguments"]
+
+            print(f"[Tool] Executing: {tool_name}")
+            print(f"[Tool] Arguments: {arguments}")
+
+            result = execute_tool(
+                tool_name,
+                arguments
+            )
+
+            print("[Tool] Result:")
+            print(result)
+
+            messages.append(
+                {
+                    "role": "tool",
+                    "content": result
+                }
+            )
+
+        print("\n[Agent] Continuing...")

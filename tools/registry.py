@@ -1,5 +1,5 @@
-from tools.python import run_python
-from tools.filesystem import list_files, read_file, write_file
+from .filesystem import list_files, read_file, write_file
+from .python import run_python
 
 
 TOOL_FUNCTIONS = {

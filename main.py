@@ -21,7 +21,7 @@
 
 
 
-from agent.llm import ask_llm
+from agent import ask_llm
 
 
 def main():

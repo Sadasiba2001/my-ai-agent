@@ -8,9 +8,13 @@ from agent.config import (
     PRIMARY_MODEL_KEY,
     PROVIDER_TYPE,
 )
+from agent.engine import AgentEngine
+from agent.memory import MemoryManager
 from agent.router import ask_llm, chat_with_llm
 
 __all__ = [
+    "AgentEngine",
+    "MemoryManager",
     "PRIMARY_MODEL_KEY",
     "ENABLE_AUTO_FALLBACK",
     "CANDIDATE_KEYS",

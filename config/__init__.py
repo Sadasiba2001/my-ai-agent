@@ -1,6 +1,4 @@
-"""Backward compatibility facade for agent.config re-exporting config package."""
-
-from config import (
+from config.settings import (
     ACTIVE_MODEL_KEY,
     ACTIVE_MODEL_NAME,
     CANDIDATE_KEYS,

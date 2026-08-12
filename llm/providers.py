@@ -1,7 +1,9 @@
 import json
 import ollama
+from openai import OpenAI
 
 from utils.formatters import _format_messages_for_openai
+
 
 # Client Cache for lazy initialization
 _CLIENT_CACHE = {}
@@ -15,7 +17,7 @@ def _get_client_for_profile(prof: dict):
 
     provider = prof["provider"]
     if provider == "nvidia":
-        from openai import OpenAI
+        
 
         client = OpenAI(
             base_url=prof["base_url"],

@@ -123,13 +123,16 @@ def ask_llm(prompt: str) -> str:
             if used_provider == "nvidia":
                 assistant_msg["tool_calls"] = [
                     {
-                        "id": tc.get("id", f"call_{i}"),
+                        "id": tc.get("id") or f"call_{i}",
                         "type": "function",
                         "function": {
                             "name": tc["function"]["name"],
-                            "arguments": json.dumps(tc["function"]["arguments"]),
+                            "arguments": json.dumps(tc["function"]["arguments"])
+                            if isinstance(tc["function"]["arguments"], (dict, list))
+                            else tc["function"]["arguments"],
                         },
                     }
+                    for i, tc in enumerate(message["tool_calls"])
                 ]
             else:
                 assistant_msg["tool_calls"] = message["tool_calls"]

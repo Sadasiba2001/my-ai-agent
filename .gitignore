@@ -76,3 +76,6 @@ dist/
 *.temp
 *.bak
 *.swp
+*.pyc
+*.pyd   
+*.pyo

@@ -15,15 +15,15 @@ from config import (
 )
 
 __all__ = [
-    "PRIMARY_MODEL_KEY",
+    "ACTIVE_MODEL_KEY",
+    "ACTIVE_MODEL_NAME",
+    "CANDIDATE_KEYS",
+    "DISPLAY_NAME",
     "ENABLE_AUTO_FALLBACK",
     "FALLBACK_KEYS",
-    "NVIDIA_API_KEY_DEFAULT",
     "MODEL_PROFILES",
-    "CANDIDATE_KEYS",
-    "ACTIVE_MODEL_KEY",
-    "profile",
+    "NVIDIA_API_KEY_DEFAULT",
+    "PRIMARY_MODEL_KEY",
     "PROVIDER_TYPE",
-    "ACTIVE_MODEL_NAME",
-    "DISPLAY_NAME",
+    "profile",
 ]

@@ -1,4 +1,4 @@
-from config.settings import (
+from my_ai_agent.config.settings import (
     ACTIVE_MODEL_KEY,
     ACTIVE_MODEL_NAME,
     CANDIDATE_KEYS,
@@ -9,7 +9,10 @@ from config.settings import (
     NVIDIA_API_KEY_DEFAULT,
     PRIMARY_MODEL_KEY,
     PROVIDER_TYPE,
+    ModelProfile,
+    Settings,
     profile,
+    settings,
 )
 
 __all__ = [
@@ -23,5 +26,8 @@ __all__ = [
     "NVIDIA_API_KEY_DEFAULT",
     "PRIMARY_MODEL_KEY",
     "PROVIDER_TYPE",
+    "ModelProfile",
+    "Settings",
     "profile",
+    "settings",
 ]

@@ -8,6 +8,6 @@ from llm.providers import (
 
 __all__ = [
     "_CLIENT_CACHE",
-    "_get_client_for_profile",
     "_execute_completion_with_profile",
+    "_get_client_for_profile",
 ]

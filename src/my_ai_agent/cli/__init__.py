@@ -1,4 +1,3 @@
 from my_ai_agent.cli.app import main
 
-if __name__ == "__main__":
-    main()
+__all__ = ["main"]

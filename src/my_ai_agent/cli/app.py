@@ -12,15 +12,19 @@ load_dotenv()
 
 
 def main() -> None:
+    
     parser = argparse.ArgumentParser(
         description="My AI Agent — Modular & Extensible Python AI Agent"
     )
+    
     parser.add_argument(
         "-v", "--version", action="version", version=f"%(prog)s {__version__}"
     )
+    
     parser.add_argument(
         "--prompt", type=str, help="Single query execution mode"
     )
+    
     parser.add_argument(
         "--log-level",
         type=str,

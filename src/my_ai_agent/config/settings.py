@@ -20,27 +20,35 @@ class ModelProfile:
 
 @dataclass(frozen=True)
 class Settings:
+    
     primary_model_key: str = field(
         default_factory=lambda: os.getenv("ACTIVE_MODEL", "minimax").lower().strip()
     )
+    
     enable_auto_fallback: bool = field(
         default_factory=lambda: os.getenv("ENABLE_AUTO_FALLBACK", "true").lower().strip() in ("true", "1", "yes")
     )
+    
     fallback_order: str = field(
         default_factory=lambda: os.getenv("FALLBACK_ORDER", "minimax,glm,ollama")
     )
+    
     nvidia_api_key_default: str = field(
         default_factory=lambda: os.getenv("NVIDIA_API_KEY", "").strip()
     )
+    
     agent_name: str = field(
         default_factory=lambda: os.getenv("AGENT_NAME", "MyAI-Agent")
     )
+    
     agent_max_iterations: int = field(
         default_factory=lambda: int(os.getenv("AGENT_MAX_ITERATIONS", "10"))
     )
+    
     agent_workspace: str = field(
         default_factory=lambda: os.getenv("AGENT_WORKSPACE", "workspace")
     )
+    
     log_level: str = field(
         default_factory=lambda: os.getenv("LOG_LEVEL", "INFO")
     )

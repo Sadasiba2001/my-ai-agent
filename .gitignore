@@ -28,7 +28,10 @@ env/
 
 workspace/
 memory/
-data/
+data/*.db
+data/*.sqlite
+data/*.sqlite3
+!data/.gitkeep
 
 # ==========================================
 # Logs
